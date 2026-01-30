@@ -20,7 +20,7 @@ export default function HomePage() {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:shadow-yellow-500/50 transition-all">
                 <FileText className="w-5 h-5 text-slate-900" />
               </div>
-              <span className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600">ResumeAI</span>
+              <span className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600">Cavario.ai</span>
             </div>
             <div className="flex gap-2 sm:gap-4">
               <Link to="/about">

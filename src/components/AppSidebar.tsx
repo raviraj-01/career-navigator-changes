@@ -40,7 +40,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="overflow-hidden">
               <h1 className="font-display text-base font-semibold text-foreground truncate">
-                ResumeAI
+                Cavario.ai
               </h1>
               <p className="text-[10px] text-muted-foreground">Consultant</p>
             </div>

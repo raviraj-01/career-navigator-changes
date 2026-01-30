@@ -13,7 +13,7 @@ export default function AboutPage() {
               <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
                 <span className="text-slate-900 font-bold">R</span>
               </div>
-              <span className="font-bold text-lg text-slate-900">ResumeAI</span>
+              <span className="font-bold text-lg text-slate-900">Cavario.ai</span>
             </div>
           </div>
         </div>
@@ -28,11 +28,11 @@ export default function AboutPage() {
             </Button>
           </Link>
 
-          <h1 className="text-4xl font-bold mb-6 text-slate-900">About ResumeAI</h1>
+          <h1 className="text-4xl font-bold mb-6 text-slate-900">About Cavario.ai</h1>
 
           <div className="max-w-none mb-12">
             <p className="text-lg text-slate-700 leading-relaxed mb-6">
-              ResumeAI is a modern, AI-powered resume builder designed to help job seekers create compelling, ATS-optimized resumes that actually get noticed by recruiters and hiring managers.
+              Cavario.ai is a modern, AI-powered resume builder designed to help job seekers create compelling, ATS-optimized resumes that actually get noticed by recruiters and hiring managers.
             </p>
 
             <h2 className="text-2xl font-bold mt-10 mb-4 text-slate-900">Our Mission</h2>
@@ -40,7 +40,7 @@ export default function AboutPage() {
               We believe everyone deserves a professional resume that showcases their unique skills and achievements. Our mission is to democratize resume building by providing intelligent tools that make the process simple, fast, and effective.
             </p>
 
-            <h2 className="text-2xl font-bold mt-10 mb-4">Why ResumeAI?</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4">Why Cavario.ai?</h2>
             <div className="space-y-6 my-6">
               <div className="border-l-4 border-yellow-500 pl-6">
                 <h3 className="font-semibold text-lg mb-2">Intelligent AI Guidance</h3>
@@ -65,7 +65,7 @@ export default function AboutPage() {
 
             <h2 className="text-2xl font-bold mt-10 mb-4">Our Story</h2>
             <p className="text-lg text-slate-300 leading-relaxed mb-6">
-              Founded by career professionals and AI enthusiasts, ResumeAI was born from frustration with outdated resume builders. We saw job seekers struggling with formatting, content optimization, and the overall resume creation process. We set out to build something better—a modern tool that combines human expertise with artificial intelligence.
+              Founded by career professionals and AI enthusiasts, Cavario.ai was born from frustration with outdated resume builders. We saw job seekers struggling with formatting, content optimization, and the overall resume creation process. We set out to build something better—a modern tool that combines human expertise with artificial intelligence.
             </p>
 
             <h2 className="text-2xl font-bold mt-10 mb-4">Key Features</h2>

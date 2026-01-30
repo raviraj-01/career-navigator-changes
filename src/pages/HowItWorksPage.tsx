@@ -36,7 +36,7 @@ export default function HowItWorksPage() {
               <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
                 <span className="text-slate-900 font-bold">R</span>
               </div>
-              <span className="font-bold text-lg text-slate-900">ResumeAI</span>
+              <span className="font-bold text-lg text-slate-900">Cavario.ai</span>
             </div>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function HowItWorksPage() {
 
           {/* Features */}
           <div className="mt-20">
-            <h2 className="text-3xl font-bold mb-12">Why Choose ResumeAI?</h2>
+            <h2 className="text-3xl font-bold mb-12">Why Choose Cavario.ai?</h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="flex gap-4">
                 <CheckCircle2 className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-1" />

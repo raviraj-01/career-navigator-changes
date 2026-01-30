@@ -58,7 +58,7 @@ export default function PricingPage() {
               <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
                 <span className="text-slate-900 font-bold">R</span>
               </div>
-              <span className="font-bold text-lg text-slate-900">ResumeAI</span>
+              <span className="font-bold text-lg text-slate-900">Cavario.ai</span>
             </div>
           </div>
         </div>

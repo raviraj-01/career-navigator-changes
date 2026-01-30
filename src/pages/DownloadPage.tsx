@@ -15,7 +15,7 @@ function downloadResumePdf(filename: string, title: string) {
   doc.setFontSize(14);
   doc.text(title, margin, 40);
   doc.setFontSize(10);
-  doc.text("ResumeAI — Payment successful. Build your full resume via AI Chat.", margin, 55);
+  doc.text("Cavario.ai — Payment successful. Build your full resume via AI Chat.", margin, 55);
   doc.save(filename);
 }
 
@@ -66,7 +66,7 @@ export default function DownloadPage() {
               <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
                 <span className="text-slate-900 font-bold">R</span>
               </div>
-              <span className="font-bold text-lg text-slate-900">ResumeAI</span>
+              <span className="font-bold text-lg text-slate-900">Cavario.ai</span>
             </div>
           </div>
         </div>

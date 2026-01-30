@@ -41,7 +41,7 @@ export default function SignInPage() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
                 <span className="text-slate-900 font-bold text-sm">R</span>
               </div>
-              <span className="font-bold text-lg text-slate-900">ResumeAI</span>
+              <span className="font-bold text-lg text-slate-900">Cavario.ai</span>
             </Link>
           </div>
         </div>
@@ -58,7 +58,7 @@ export default function SignInPage() {
 
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2 text-slate-900">Welcome Back</h1>
-            <p className="text-slate-700">Sign in to your ResumeAI account</p>
+            <p className="text-slate-700">Sign in to your Cavario.ai account</p>
           </div>
 
           <form onSubmit={handleSignIn} className="space-y-6 bg-white p-8 rounded-2xl border border-slate-200 shadow-lg">
