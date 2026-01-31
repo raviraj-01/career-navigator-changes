@@ -11,7 +11,7 @@ export default function AboutPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
-                <span className="text-slate-900 font-bold">R</span>
+                <span className="text-slate-900 font-bold">C</span>
               </div>
               <span className="font-bold text-lg text-slate-900">Cavario.ai</span>
             </div>

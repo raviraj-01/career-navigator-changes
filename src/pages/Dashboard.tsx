@@ -1,27 +1,66 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, PlusCircle, Target, TrendingUp, Clock, ArrowRight } from "lucide-react";
+import { FileText, PlusCircle, Target, TrendingUp, Clock, ArrowRight, BarChart3 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserResumes } from "@/contexts/UserResumesContext";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { computeAtsScore } from "@/lib/atsScore";
+import type { StoredResume } from "@/lib/userResumes";
 
-const recentResumes = [
-  { id: 1, company: "Google", created: "2 days ago", status: "Complete" },
-  { id: 2, company: "Microsoft", created: "5 days ago", status: "Complete" },
-  { id: 3, company: "Amazon", created: "1 week ago", status: "Draft" },
-];
-
-const stats = [
-  { label: "Resumes Created", value: "12", icon: FileText, trend: "+3 this month" },
-  { label: "Companies Targeted", value: "8", icon: Target, trend: "+2 this week" },
-  { label: "Avg. Completion Time", value: "8 min", icon: Clock, trend: "Improved by 2 min" },
-];
+function formatCreated(created: string): string {
+  const d = new Date(created);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} week(s) ago`;
+  return created;
+}
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const { resumes } = useUserResumes();
+
+  const sortedResumes = [...resumes].sort(
+    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
+  );
+  const recentResumes = sortedResumes.slice(0, 5).map((r) => ({
+    id: r.id,
+    company: r.title.split(" - ")[0] || r.role || "Resume",
+    created: formatCreated(r.created),
+    status: r.status,
+  }));
+
+  const stats = [
+    { label: "Resumes Created", value: String(resumes.length), icon: FileText, trend: resumes.length ? "Your saved resumes" : "Create your first" },
+    { label: "Resume Type", value: resumes.length ? String(new Set(resumes.map((r) => r.role)).size) : "0", icon: Target, trend: "categories used" },
+    { label: "Latest", value: sortedResumes.length ? formatCreated(sortedResumes[0].created) : "—", icon: Clock, trend: "most recent" },
+  ];
+
+  const getAtsScore = (r: StoredResume) => r.atsScore ?? computeAtsScore(r.messages);
+  const chartData = sortedResumes.map((r) => ({
+    name: r.title.split(" - ")[0]?.slice(0, 18) || r.role || "Resume",
+    fullTitle: r.title,
+    atsScore: getAtsScore(r),
+  }));
+
+  const atsChartConfig = {
+    atsScore: {
+      label: "ATS Score",
+      color: "hsl(var(--accent))",
+    },
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8 animate-fade-in">
       {/* Welcome Section */}
       <div className="space-y-2">
         <h1 className="font-display text-3xl font-bold text-foreground">
-          Welcome back
+          Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
         </h1>
         <p className="text-muted-foreground">
           Create tailored resumes that get you noticed.
@@ -47,6 +86,58 @@ export default function Dashboard() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* ATS Score Bar Chart */}
+      {resumes.length > 0 && (
+        <Card className="shadow-soft">
+          <CardHeader>
+            <CardTitle className="font-display text-lg flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-accent" />
+              Resume ATS Scores
+            </CardTitle>
+            <CardDescription>
+              Your created resumes by ATS compatibility score (0–100). Higher is better for applicant tracking systems.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={atsChartConfig} className="h-[280px] w-full">
+              <BarChart data={chartData} margin={{ top: 12, right: 12, bottom: 24, left: 12 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis
+                  dataKey="name"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(v) => (v.length > 12 ? v.slice(0, 12) + "…" : v)}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(v) => `${v}`}
+                />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(_, payload) => payload?.[0]?.payload?.fullTitle ?? ""}
+                      formatter={(value: number) => (
+                        <div className="flex w-full justify-between gap-2 items-center">
+                          <span className="text-muted-foreground">ATS Score</span>
+                          <span className="font-mono font-medium tabular-nums text-foreground">
+                            {value} / 100
+                          </span>
+                        </div>
+                      )}
+                    />
+                  }
+                />
+                <Bar dataKey="atsScore" fill="var(--color-atsScore)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -87,29 +178,35 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {recentResumes.map((resume) => (
-              <div
-                key={resume.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-card flex items-center justify-center shadow-soft">
-                    <FileText className="w-4 h-4 text-accent" />
+            {recentResumes.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4 text-center">
+                No resumes yet. Create one with AI from the chat.
+              </p>
+            ) : (
+              recentResumes.map((resume) => (
+                <div
+                  key={resume.id}
+                  className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-card flex items-center justify-center shadow-soft">
+                      <FileText className="w-4 h-4 text-accent" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{resume.company}</p>
+                      <p className="text-xs text-muted-foreground">{resume.created}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-sm text-foreground">{resume.company}</p>
-                    <p className="text-xs text-muted-foreground">{resume.created}</p>
-                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    resume.status === "Complete"
+                      ? "bg-accent/20 text-accent"
+                      : "bg-muted text-muted-foreground"
+                  }`}>
+                    {resume.status}
+                  </span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  resume.status === "Complete" 
-                    ? "bg-accent/20 text-accent" 
-                    : "bg-muted text-muted-foreground"
-                }`}>
-                  {resume.status}
-                </span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>

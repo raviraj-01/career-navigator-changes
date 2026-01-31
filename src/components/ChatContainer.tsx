@@ -5,9 +5,12 @@ import { ChatInput } from "./ChatInput";
 import { TypingIndicator } from "./TypingIndicator";
 import { useChat } from "@/hooks/useChat";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, FileText, Sparkles, ArrowLeft, Download, Building2, Server, Rocket, Globe } from "lucide-react";
+import { RotateCcw, FileText, Sparkles, ArrowLeft, Download, Building2, Server, Rocket, Globe, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
 import { downloadResumeAsPdf, looksLikeCompleteResume } from "@/lib/pdfResume";
+import { computeAtsScore } from "@/lib/atsScore";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserResumes } from "@/contexts/UserResumesContext";
 import { toast } from "sonner";
 import type { ResumeCategory } from "@/hooks/useChat";
 
@@ -25,6 +28,8 @@ export function ChatContainer() {
   const [subscriptionChecked, setSubscriptionChecked] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<ResumeCategory | null>(null);
   const [pdfGenerated, setPdfGenerated] = useState(false);
+  const { user } = useAuth();
+  const { addResume } = useUserResumes();
   const { messages, isLoading, sendMessage, initializeChat, resetChat, isInitialized } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +59,22 @@ export function ChatContainer() {
     try {
       downloadResumeAsPdf(messages);
       setPdfGenerated(true);
-      toast.success("PDF generated. You can download it below.");
+      if (user?.id) {
+        const categoryLabel = selectedCategory
+          ? CATEGORIES.find((c) => c.id === selectedCategory)?.label ?? "Resume"
+          : "Resume";
+        addResume({
+          title: `${categoryLabel} - ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
+          role: categoryLabel,
+          created: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+          status: "Complete",
+          messages: messages.map((m) => ({ role: m.role, content: m.content })),
+          atsScore: computeAtsScore(messages.map((m) => ({ role: m.role, content: m.content }))),
+        });
+        toast.success("PDF generated and saved to your dashboard.");
+      } else {
+        toast.success("PDF generated. You can download it below.");
+      }
     } catch (err) {
       console.error("PDF generation failed:", err);
       toast.error("Failed to generate PDF. Please try again.");
@@ -69,6 +89,13 @@ export function ChatContainer() {
       console.error("PDF download failed:", err);
       toast.error("Failed to download PDF. Please try again.");
     }
+  };
+
+  const handleReviewResume = () => {
+    sendMessage(
+      "I'd like to review my resume. Please ask me if there are any changes I'd like to make—sections to add, remove, or improve."
+    );
+    toast.info("AI will ask about changes you need.");
   };
 
   const handleStartWithCategory = (category: ResumeCategory) => {
@@ -233,13 +260,21 @@ export function ChatContainer() {
             </div>
           )}
           {canShowDownloadPdf && (
-            <div className="flex justify-center">
+            <div className="flex flex-wrap justify-center gap-3">
               <Button
                 onClick={handleDownloadResume}
                 className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-slate-900 font-semibold gap-2 shadow-md"
               >
                 <Download className="w-4 h-4" />
-                Download your resume (PDF)
+                Download PDF
+              </Button>
+              <Button
+                onClick={handleReviewResume}
+                variant="outline"
+                className="border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold gap-2"
+              >
+                <ClipboardList className="w-4 h-4" />
+                Review
               </Button>
             </div>
           )}

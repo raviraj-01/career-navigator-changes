@@ -13,6 +13,8 @@ interface UserProfile {
 interface AuthContextType {
   user: UserProfile | null;
   isLoggedIn: boolean;
+  /** False until we've read auth from localStorage (prevents redirect on refresh) */
+  isAuthReady: boolean;
   login: (email: string, password: string) => void;
   signup: (userData: Omit<UserProfile, "id" | "joinDate">) => void;
   logout: () => void;
@@ -21,18 +23,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const AUTH_STORAGE_KEY = "resumeai_user";
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
-  // Load user from localStorage on mount
+  // Load user from localStorage on mount (must run before deciding to redirect)
   useEffect(() => {
-    const savedUser = localStorage.getItem("resumeai_user");
+    const savedUser = localStorage.getItem(AUTH_STORAGE_KEY);
     if (savedUser) {
-      const userData = JSON.parse(savedUser);
-      setUser(userData);
-      setIsLoggedIn(true);
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+        setIsLoggedIn(true);
+      } catch {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+      }
     }
+    setIsAuthReady(true);
   }, []);
 
   const signup = (userData: Omit<UserProfile, "id" | "joinDate">) => {
@@ -45,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         day: "numeric",
       }),
     };
-    localStorage.setItem("resumeai_user", JSON.stringify(newUser));
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
     setUser(newUser);
     setIsLoggedIn(true);
   };
@@ -65,24 +75,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         day: "numeric",
       }),
     };
-    localStorage.setItem("resumeai_user", JSON.stringify(mockUser));
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(mockUser));
     setUser(mockUser);
     setIsLoggedIn(true);
   };
 
   const logout = () => {
-    localStorage.removeItem("resumeai_user");
+    localStorage.removeItem(AUTH_STORAGE_KEY);
     setUser(null);
     setIsLoggedIn(false);
   };
 
   const updateProfile = (profile: UserProfile) => {
-    localStorage.setItem("resumeai_user", JSON.stringify(profile));
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(profile));
     setUser(profile);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, login, signup, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, isAuthReady, login, signup, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
